@@ -2,11 +2,11 @@ package api
 
 import (
 	"errors"
+	"github.com/angel-one/go-utils/log"
+	"github.com/gin-gonic/gin"
 	"github.com/sinhashubham95/go-example-project/business"
 	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/sinhashubham95/go-example-project/models"
-	"github.com/angel-one/go-utils/log"
-	"github.com/gin-gonic/gin"
 	"net/http"
 )
 

@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/angel-one/go-utils/log"
+	"github.com/sinhashubham95/go-example-project/constants"
 	"time"
 )
 

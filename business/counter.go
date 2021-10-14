@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/angel-one/go-utils/log"
 	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/sinhashubham95/go-example-project/utils/configs"
 	"github.com/sinhashubham95/go-example-project/utils/database"
-	"github.com/angel-one/go-utils/log"
 	"time"
 )
 

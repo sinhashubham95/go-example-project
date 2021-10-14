@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/sinhashubham95/go-example-project/constants"
-	"github.com/sinhashubham95/go-example-project/utils/flags"
 	"github.com/gin-gonic/gin"
 	goActuator "github.com/sinhashubham95/go-actuator"
+	"github.com/sinhashubham95/go-example-project/constants"
+	"github.com/sinhashubham95/go-example-project/utils/flags"
 )
 
 var (

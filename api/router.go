@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/gin-gonic/gin"
+	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )

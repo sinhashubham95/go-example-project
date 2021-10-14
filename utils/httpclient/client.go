@@ -1,8 +1,8 @@
 package httpclient
 
 import (
-	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/angel-one/go-utils/log"
+	"github.com/sinhashubham95/go-example-project/constants"
 	"golang.org/x/net/publicsuffix"
 	"net"
 	"net/http"

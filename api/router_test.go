@@ -2,8 +2,8 @@ package api_test
 
 import (
 	"bytes"
-	"github.com/sinhashubham95/go-example-project/models"
 	"encoding/json"
+	"github.com/sinhashubham95/go-example-project/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
