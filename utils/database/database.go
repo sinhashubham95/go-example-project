@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/angel-one/go-utils/log"
@@ -22,8 +23,8 @@ type Config struct {
 
 var db *sql.DB
 
-func InitDatabase(config Config) error {
-	log.Info(nil).Interface(constants.DatabaseConfigKey, config).Msg("initializing database")
+func InitDatabase(ctx context.Context, config Config) error {
+	log.Info(ctx).Interface(constants.DatabaseConfigKey, config).Msg("initializing database")
 	var err error
 
 	// open the database

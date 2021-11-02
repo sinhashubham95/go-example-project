@@ -12,8 +12,8 @@ import (
 )
 
 // CreateCounter is used to create a new counter against this key
-func CreateCounter(key string) error {
-	ctx, cancel := getCounterContext()
+func CreateCounter(ctx context.Context, key string) error {
+	ctx, cancel := getCounterContext(ctx)
 	defer cancel()
 
 	db := database.Get()
@@ -39,8 +39,8 @@ func CreateCounter(key string) error {
 }
 
 // IncrementCounter is used to increment the count for the counter if it already exists
-func IncrementCounter(key string) error {
-	ctx, cancel := getCounterContext()
+func IncrementCounter(ctx context.Context, key string) error {
+	ctx, cancel := getCounterContext(ctx)
 	defer cancel()
 
 	db := database.Get()
@@ -67,7 +67,7 @@ func IncrementCounter(key string) error {
 
 // DecrementCounter is used to decrement the count for the counter if it already exists
 func DecrementCounter(ctx context.Context, key string) error {
-	ctx, cancel := getCounterContext()
+	ctx, cancel := getCounterContext(ctx)
 	defer cancel()
 
 	db := database.Get()
@@ -97,8 +97,8 @@ func DecrementCounter(ctx context.Context, key string) error {
 }
 
 // CurrentCount is used to get the current value of counter if it exists
-func CurrentCount(key string) (int, error) {
-	ctx, cancel := getCounterContext()
+func CurrentCount(ctx context.Context, key string) (int, error) {
+	ctx, cancel := getCounterContext(ctx)
 	defer cancel()
 
 	db := database.Get()
@@ -117,13 +117,13 @@ func CurrentCount(key string) (int, error) {
 	return count, nil
 }
 
-func getCounterContext() (context.Context, context.CancelFunc) {
-	counterConfig, err := configs.Get(constants.CounterConfig)
+func getCounterContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	counterQueryTimeoutInMillis, err := configs.Get().GetInt(constants.CounterConfig,
+		constants.CounterQueryTimeoutInMillisKey)
 	if err != nil {
-		return context.Background(), func() {}
+		return ctx, func() {}
 	}
-	return context.WithTimeout(context.Background(),
-		time.Millisecond*counterConfig.GetDuration(constants.CounterQueryTimeoutInMillisKey))
+	return context.WithTimeout(ctx, time.Millisecond*time.Duration(counterQueryTimeoutInMillis))
 }
 
 func doesCounterExist(ctx context.Context, tx *sql.Tx, key string) (int, bool) {

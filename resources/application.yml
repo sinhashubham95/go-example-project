@@ -1,10 +1,19 @@
-http:
-  connectTimeoutInMillis: 10000
-  keepAliveDurationInMillis: 30000
-  maxIdleConnections: 100
-  idleConnectionTimeoutInMillis: 90000
-  tlsHandshakeTimeoutInMillis: 10000
-  expectContinueTimeoutInMillis: 1000
-  timeoutInMillis: 15000
 counter:
   queryTimeoutInMillis: 5000
+
+http:
+  moxy:
+    method: GET
+    url: https://mocker-proxy.herokuapp.com
+    timeoutinmillis: 1000
+    retrycount: 3
+    backoffpolicy:
+      constantbackoff:
+        intervalinmillis: 2
+        maxJitterintervalinmillis: 5
+    hystrixconfig:
+      hystrixtimeoutinmillis: 1100
+      maxconcurrentrequests: 10
+      errorpercentthresold: 20
+      sleepwindowinmillis : 10
+      requestvolumethreshold: 10

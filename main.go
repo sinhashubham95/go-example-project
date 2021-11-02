@@ -1,19 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/angel-one/go-utils/log"
+	"github.com/angel-one/go-utils/middlewares"
 	"github.com/sinhashubham95/go-example-project/api"
 	"github.com/sinhashubham95/go-example-project/constants"
 	"github.com/sinhashubham95/go-example-project/utils/configs"
 	"github.com/sinhashubham95/go-example-project/utils/database"
 	"github.com/sinhashubham95/go-example-project/utils/flags"
 	"github.com/sinhashubham95/go-example-project/utils/httpclient"
-	"github.com/angel-one/go-utils/log"
-	"github.com/angel-one/go-utils/middlewares"
 	"time"
 
-	_ "github.com/sinhashubham95/go-example-project/docs"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/sinhashubham95/go-example-project/docs"
 )
 
 // @title Go Example Project
@@ -27,91 +28,73 @@ import (
 // @BasePath /
 
 func main() {
-	initConfigs()
-	startLogger()
+	ctx := context.Background()
+	initConfigs(ctx)
+	initLogger(ctx)
 	initHTTPClient()
-	initDatabase()
-	defer closeDatabase()
-	startRouter()
+	initDatabase(ctx)
+	defer closeDatabase(ctx)
+	startRouter(ctx)
 }
 
-func initConfigs() {
+func initConfigs(ctx context.Context) {
 	// init configs
-	configs.Init(flags.BaseConfigPath())
+	err := configs.Init(flags.BaseConfigPath(), constants.LoggerConfig, constants.ApplicationConfig,
+		constants.DatabaseConfig)
+	if err != nil {
+		log.Fatal(ctx).Err(err).Msg("error initialising configs")
+	}
 }
 
-func startLogger() {
+func initLogger(ctx context.Context) {
 	// start logger
-	loggerConfig, err := configs.Get(constants.LoggerConfig)
+	logLevel, err := configs.Get().GetString(constants.LoggerConfig, constants.LogLevelConfigKey)
 	if err != nil {
-		log.Fatal(nil).Err(err).Msg("error getting logger config")
+		log.Fatal(ctx).Err(err).Msg("error getting log level")
 	}
-	log.InitLogger(log.Level(loggerConfig.GetString(constants.LogLevelConfigKey)))
+	log.InitLogger(log.Level(logLevel))
 }
 
 func initHTTPClient() {
-	// get application configs
-	applicationConfig, err := configs.Get(constants.ApplicationConfig)
-	if err != nil {
-		log.Fatal(nil).Err(err).Msg("error getting application config")
-	}
-
-	// init http client
-	err = httpclient.Init(httpclient.Config{
-		ConnectTimeout: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPConnectTimeoutInMillisKey),
-		KeepAliveDuration: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPKeepAliveDurationInMillisKey),
-		MaxIdleConnections: applicationConfig.GetInt(constants.HTTPMaxIdleConnectionsKey),
-		IdleConnectionTimeout: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPIdleConnectionTimeoutInMillisKey),
-		TLSHandshakeTimeout: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPTlsHandshakeTimeoutInMillisKey),
-		ExpectContinueTimeout: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPExpectContinueTimeoutInMillisKey),
-		Timeout: time.Millisecond *
-			applicationConfig.GetDuration(constants.HTTPTimeoutInMillisKey),
-	})
-	if err != nil {
-		log.Fatal(nil).Err(err).Msg("unable to initialize http client")
-	}
+	httpclient.Init(
+		httpclient.NewRequestConfig("moxy", configs.Get().GetMapD(constants.ApplicationConfig,
+			"http.moxy", nil)),
+	)
 }
 
-func initDatabase() {
+func initDatabase(ctx context.Context) {
 	// init database
-	databaseConfig, err := configs.Get(constants.DatabaseConfig)
-	if err != nil {
-		log.Fatal(nil).Err(err).Msg("error getting database config")
-	}
-	err = database.InitDatabase(database.Config{
-		Server:                databaseConfig.GetString(constants.DatabaseServerConfigKey),
-		Port:                  databaseConfig.GetInt(constants.DatabasePortConfigKey),
-		Name:                  databaseConfig.GetString(constants.DatabaseNameConfigKey),
-		Username:              databaseConfig.GetString(constants.DatabaseUsernameConfigKey),
-		Password:              databaseConfig.GetString(constants.DatabasePasswordConfigKey),
-		MaxOpenConnections:    databaseConfig.GetInt(constants.DatabaseMaxOpenConnectionsKey),
-		MaxIdleConnections:    databaseConfig.GetInt(constants.DatabaseMaxIdleConnectionsKey),
-		ConnectionMaxLifetime: databaseConfig.GetDuration(constants.DatabaseConnectionMaxLifetimeInSecondsKey) * time.Second,
-		ConnectionMaxIdleTime: databaseConfig.GetDuration(constants.DatabaseConnectionMaxIdleTimeInSecondsKey) * time.Second,
+	err := database.InitDatabase(ctx, database.Config{
+		Server:             configs.Get().GetStringD(constants.DatabaseConfig, constants.DatabaseServerConfigKey, ""),
+		Port:               int(configs.Get().GetIntD(constants.DatabaseConfig, constants.DatabasePortConfigKey, 0)),
+		Name:               configs.Get().GetStringD(constants.DatabaseConfig, constants.DatabaseNameConfigKey, ""),
+		Username:           configs.Get().GetStringD(constants.DatabaseConfig, constants.DatabaseUsernameConfigKey, ""),
+		Password:           configs.Get().GetStringD(constants.DatabaseConfig, constants.DatabasePasswordConfigKey, ""),
+		MaxOpenConnections: int(configs.Get().GetIntD(constants.DatabaseConfig, constants.DatabaseMaxOpenConnectionsKey, 0)),
+		MaxIdleConnections: int(configs.Get().GetIntD(constants.DatabaseConfig, constants.DatabaseMaxIdleConnectionsKey, 0)),
+		ConnectionMaxLifetime: time.Duration(configs.Get().GetIntD(constants.DatabaseConfig,
+			constants.DatabaseConnectionMaxLifetimeInSecondsKey, 0)) * time.Second,
+		ConnectionMaxIdleTime: time.Duration(configs.Get().GetIntD(constants.DatabaseConfig,
+			constants.DatabaseConnectionMaxIdleTimeInSecondsKey, 0)) * time.Second,
 	})
 	if err != nil {
-		log.Fatal(nil).Err(err).Msg("unable to initialize database")
+		log.Fatal(ctx).Err(err).Msg("unable to initialize database")
 	}
 }
 
-func closeDatabase() {
+func closeDatabase(ctx context.Context) {
 	err := database.Close()
 	if err != nil {
-		log.Fatal(nil).Err(err).Msg("error closing database")
+		log.Fatal(ctx).Err(err).Msg("error closing database")
 	}
 }
 
-func startRouter() {
+func startRouter(ctx context.Context) {
 	// get router
 	router := api.GetRouter(middlewares.Logger(middlewares.LoggerMiddlewareOptions{}))
 	// now start router
 	err := router.Run(fmt.Sprintf(":%d", flags.Port()))
 	if err != nil {
-		log.Fatal(nil).Err(err).Msg("error starting router")
+		log.Fatal(ctx).Err(err).Msg("error starting router")
 	}
 }

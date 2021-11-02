@@ -31,7 +31,7 @@ func createCounter(ctx *gin.Context) {
 	}
 
 	// now create a new counter
-	err = business.CreateCounter(key)
+	err = business.CreateCounter(ctx, key)
 	if err != nil {
 		sendCounterInternalServerError(ctx, err)
 		return
@@ -62,7 +62,7 @@ func incrementCounter(ctx *gin.Context) {
 	}
 
 	// now increment the counter
-	err = business.IncrementCounter(key)
+	err = business.IncrementCounter(ctx, key)
 	if err != nil {
 		sendCounterInternalServerError(ctx, err)
 	}
@@ -115,7 +115,7 @@ func currentCount(ctx *gin.Context) {
 		return
 	}
 
-	count, err := business.CurrentCount(key)
+	count, err := business.CurrentCount(ctx, key)
 	if err != nil {
 		sendCounterInternalServerError(ctx, err)
 		return

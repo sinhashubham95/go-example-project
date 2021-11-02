@@ -4,14 +4,13 @@ import (
 	"context"
 	"github.com/sinhashubham95/go-example-project/external/processor"
 	"github.com/sinhashubham95/go-example-project/utils/httpclient"
-	"time"
 )
 
 // GetMoxy is used to get the response from the moxy service
-func GetMoxy(ctx context.Context, url string) (string, error) {
-	response, err := httpclient.GETWithTimeout(url, nil, 5*time.Second)
+func GetMoxy(ctx context.Context) (string, error) {
+	response, err := httpclient.Get().Request(httpclient.NewRequest("moxy").SetContext(ctx))
 	if err != nil {
 		return "", err
 	}
-	return processor.ProcessMoxyResponse(ctx, response)
+	return processor.ProcessMoxyResponse(response)
 }

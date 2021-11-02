@@ -3,7 +3,6 @@ package constants
 // config names
 const (
 	LoggerConfig      = "logger"
-	MoxyConfig        = "moxy"
 	ApplicationConfig = "application"
 	DatabaseConfig    = "database"
 	CounterConfig     = "counter"
@@ -12,14 +11,6 @@ const (
 // config keys
 const (
 	LogLevelConfigKey                         = "level"
-	URLConfigKey                              = "url"
-	HTTPConnectTimeoutInMillisKey             = "http.connectTimeoutInMillis"
-	HTTPKeepAliveDurationInMillisKey          = "http.keepAliveDurationInMillis"
-	HTTPMaxIdleConnectionsKey                 = "http.maxIdleConnections"
-	HTTPIdleConnectionTimeoutInMillisKey      = "http.idleConnectionTimeoutInMillis"
-	HTTPTlsHandshakeTimeoutInMillisKey        = "http.tlsHandshakeTimeoutInMillis"
-	HTTPExpectContinueTimeoutInMillisKey      = "http.expectContinueTimeoutInMillis"
-	HTTPTimeoutInMillisKey                    = "http.timeoutInMillis"
 	DatabaseServerConfigKey                   = "server"
 	DatabasePortConfigKey                     = "port"
 	DatabaseNameConfigKey                     = "name"
